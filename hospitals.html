@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggested Hospitals</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        /* body {
+            background: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        .loading {
+            display: none;
+            color: #007bff;
+            font-weight: bold;
+            margin-top: 10px;
+        } */
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🏥 Suggested Hospitals</h2>
+        <p id="locationText"></p>
+        <div id="hospitalResults"></div>
+        <p class="loading" id="loading">🔄 Searching for hospitals...</p>
+        <button class="btn btn-secondary w-100 mt-3" onclick="goBack()">Back</button>
+    </div>
+
+    <script>
+        const apiBaseUrl = "http://127.0.0.1:5000";
+
+        async function fetchHospitals(city, localAddress) {
+            let loading = document.getElementById("loading");
+            let results = document.getElementById("hospitalResults");
+
+            if (!city || !localAddress) {
+                results.innerHTML = `<p class="text-danger">❌ No city or local address provided.</p>`;
+                return;
+            }
+
+            loading.style.display = "block";
+            results.innerHTML = "";
+
+            try {
+                let response = await fetch(`${apiBaseUrl}/get_hospitals?city=${encodeURIComponent(city)}&localAddress=${encodeURIComponent(localAddress)}`);
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch hospital data.");
+                }
+
+                let data = await response.json();
+                loading.style.display = "none";
+
+                if (!data.hospitals || data.hospitals.length === 0) {
+                    results.innerHTML = `<p class="text-danger">❌ No hospitals found. Please try a different location.</p>`;
+                    return;
+                }
+
+                let hospitalList = "<h4 class='text-primary'>Suggested Hospitals</h4>";
+                data.hospitals.forEach(hospital => {
+                    hospitalList += `
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <h5 class="card-title">${hospital["Hospital Name"]}</h5>
+                                <p class="card-text">${hospital["Local Address"]}, ${hospital.City}, ${hospital.State}, Pincode: ${hospital.Pincode}</p>
+                            </div>
+                        </div>`;
+                });
+
+                results.innerHTML = hospitalList;
+            } catch (error) {
+                loading.style.display = "none";
+                results.innerHTML = `<p class="text-danger">❌ Error fetching hospital data.</p>`;
+                console.error("❌ Error:", error);
+            }
+        }
+
+        function goBack() {
+            window.location.href = "page4.html"; // Go back to the page where user inputs city and address
+        }
+
+        window.onload = function () {
+            let city = localStorage.getItem("city") || "";
+            let localAddress = localStorage.getItem("localAddress") || "";
+
+            if (!city || !localAddress) {
+                document.getElementById("locationText").innerText = "Please enter a valid city and address on the previous page.";
+                return;
+            }
+
+            document.getElementById("locationText").innerText = `Showing hospitals near ${city}, ${localAddress}`;
+            fetchHospitals(city, localAddress);
+        };
+    </script>
+</body>
+</html>

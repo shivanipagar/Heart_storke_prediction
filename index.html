@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stroke Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-image: url("{{ url_for('static', filename='image/index_back.jpg') }}");
+            font-family:'Times New Roman', Times, serif ;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            max-width: auto;
+            width: 100%;
+            padding: 20px;
+            align-items: center; 
+        }
+        .heart_image {
+            background-image: url("{{ url_for('static', filename='image/index_heart.png') }}");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 140%; /* or cover */
+            height: 500px; /* Add a fixed height */
+            width: 40%;
+        }
+        .content {
+            color: white;
+            text-align: center;   
+            padding: 0px;
+            max-width: 1000px;
+            margin: 0;
+            
+        }
+        
+        h1 {
+            font-size: 3.8rem;
+            margin-bottom: 15px;
+        }
+        
+        p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+        
+        ul {
+            text-align: left;
+            margin-left: 20px;
+            font-size: 1.1rem;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #007bff;
+        }
+        
+        .start-btn {
+            background-color: #6a0b0a;
+            border: 1px solid #420807;
+            font-size: 1.2rem;
+            margin-top: 30px;
+        }
+        
+        .start-btn:hover {
+            color: #e9d2d2;
+            background-color: #420807;
+        }
+        
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        footer p {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="heart_image">
+        </div>
+        <div class="content">
+            <h1>Heart Stroke Prediction </h1>
+        
+            <p>Your Smart Health Companion – Stroke Prediction with Machine Learning.</p>
+           
+            
+            <button class="start-btn" onclick="goToInputPage()">Get Started</button>
+        </div>
+    </div>
+
+
+    <script>
+        function goToInputPage() {
+            window.location.href = '/input';  // ✅ Flask route
+        }
+    </script>
+</body>
+</html>

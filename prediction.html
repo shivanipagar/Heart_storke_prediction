@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stroke Prediction Result</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+  <style>
+    body {
+      /* background: linear-gradient(to right, #e0f7fa, #f1f8e9); */
+      background: linear-gradient(to left, #fffbfb, #ffdada);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+    .container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      max-width: 1100px;
+      padding: 40px;
+      margin-top: 40px;
+    }
+    .center-text {
+      text-align: center;
+    }
+    .risk-text {
+      font-size: 20px;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 10px;
+    }
+    .high-risk {
+      background-color: #dc3545;
+      color: white;
+    }
+    .low-risk {
+      background-color: #28a745;
+      color: white;
+    }
+    .advice-box {
+      background: #f8f9fa;
+      border-left: 5px solid #007bff;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    .btn-custom {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      /* padding: 10px; */
+     
+      font-size: 16px;
+      border-radius: 8px;
+    
+    }
+    .btn-custom:hover {
+      color: white;
+      background-color: #0056b3;
+    }
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+    /* Fixed size pie chart */
+    #strokePieChart {
+      width: 300px !important;  /* Set width to 300px */
+      height: 300px !important;
+      margin: 0 auto;  /* Horizontally center the chart */
+      display: block;  /* Set height to 300px */
+    }
+    #importanceChart {
+        height: 300px !important;  /* Adjust the height as needed */
+    }
+    .home-top-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      background: #ddd;
+      color: #333;
+      font-weight: 500;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Top Row: Left and Right Sections (Centered) -->
+    <div class="row mb-4">
+      <div class="col-12 center-text">
+        <!-- Left Column: Your Stroke Risk -->
+        <h2> Your Stroke Risk</h2>
+        <h1 id="probability" class="text-primary">--%</h1>
+        <h3 id="riskLevel" class="risk-text">Risk Level: --</h3>
+      </div>
+      <div class="col-12 center-text">
+        <!-- Right Column: Recommended Actions and Next Steps Button -->
+        <div class="advice-box">
+        <h3>🛡️ Recommended Actions</h3>
+          <p id="advice">--</p>
+          <button class="btn btn-custom" onclick="goToNextSteps()">Next Steps →</button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Second Row: Feature Importance and Pie Chart -->
+    <div class="row">
+      <!-- Left Column: Feature Importance -->
+      <div class="col-md-6">
+        <h3>📊 Feature Importance</h3>
+        <canvas id="importanceChart"></canvas>
+      </div>
+
+      <!-- Right Column: Stroke Pie Chart -->
+      <div class="col-md-6">
+        <h3>📊 Stroke Prediction Overview</h3>
+        <canvas id="strokePieChart"></canvas>
+      </div>
+    </div>
+  </div>
+<button class="btn btn-secondary home-top-btn" onclick="goHome()">🏠 Home</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Simulated: getStrokeRisk()
+    function getStrokeRisk() {
+      let probability = localStorage.getItem("probability") || "--";
+      let riskLevel = localStorage.getItem("riskLevel") || "--";
+
+      if (probability !== "--") {
+        probability = (parseFloat(probability) * 100).toFixed(2);  // Convert to percentage
+      }
+
+      document.getElementById("probability").innerText = probability + "%";
+
+      const riskElement = document.getElementById("riskLevel");
+      const adviceElement = document.getElementById("advice");
+
+      if (riskLevel === "High") {
+        riskElement.innerText = "⚠️ High Risk";
+        riskElement.classList.add("high-risk");
+        adviceElement.innerText = "🚨 Please consult a healthcare professional immediately. Monitor BP, manage lifestyle, and follow strict health routines.";
+      } else {
+        riskElement.innerText = "✅ Low Risk";
+        riskElement.classList.add("low-risk");
+        adviceElement.innerText = "👍 Great job! Keep exercising, eat well, and avoid risk factors like smoking.";
+      }
+    }
+
+    // Simulated: Feature Importance Chart
+    function renderFeatureImportance() {
+      const ctx = document.getElementById("importanceChart");
+
+      // Dummy example — replace with dynamic data if you want
+      const features = JSON.parse(localStorage.getItem("importanceFeatures")) || [
+        "age", "avg_glucose_level", "bmi", "hypertension", "heart_disease",
+        "smoking_status", "work_type", "Residence_type", "ever_married", "gender"
+      ];
+      const scores = JSON.parse(localStorage.getItem("importanceScores")) || [0.19, 0.15, 0.13, 0.12, 0.11, 0.08, 0.07, 0.06, 0.05, 0.04];
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: features,
+          datasets: [{
+            label: "Importance Score",
+            data: scores,
+            backgroundColor: "#007bff"
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: {
+              label: ctx => `${ctx.dataset.label}: ${ctx.raw.toFixed(2)}`
+            }}
+          },
+          scales: {
+            y: { beginAtZero: true, max: Math.max(...scores) + 0.05 }
+          }
+        }
+      });
+    }
+
+    // Dynamic: Stroke Pie Chart based on Prediction
+    function renderStrokePieChart() {
+      const ctx = document.getElementById("strokePieChart");
+
+      // Get stroke probability value dynamically
+      let probability = parseFloat(localStorage.getItem("probability")) || 0.34; // Default 0.34 (34%)
+      let strokePercentage = (probability * 100).toFixed(2);  // Convert to percentage
+      let noStrokePercentage = (100 - strokePercentage).toFixed(2);  // No-stroke cases
+
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ["Stroke", "No Stroke"],
+          datasets: [{
+            data: [strokePercentage, noStrokePercentage],
+            backgroundColor: ["#dc3545", "#28a745"],
+            hoverBackgroundColor: ["#c82333", "#218838"]
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: ctx => `${ctx.label}: ${ctx.raw}%`
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function goToNextSteps() {
+      window.location.href = "/page4";
+    }
+
+  function goHome() {
+    window.location.href = "/";
+  }
+
+
+
+    window.onload = function () {
+      getStrokeRisk();
+      renderFeatureImportance();
+      renderStrokePieChart();
+    };
+  </script>
+</body>
+</html>
